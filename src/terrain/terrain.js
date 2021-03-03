@@ -246,7 +246,7 @@ export class Terrain extends Elevation {
         this._tilesDirty = {};
         this.style = style;
         this._useVertexMorphing = true;
-        this.minElevationInMeters = Number.POSITIVE_INFINITY;
+        this.minElevationInMeters = 0;
     }
 
     set style(style: Style) {
@@ -308,6 +308,7 @@ export class Terrain extends Elevation {
 
             this._emptyDEMTextureDirty = true;
 
+            this.minElevationInMeters = 0;
             for (let tile of this._visibleDemTiles) {
                 const minMaxTree = tile.dem._tree;
                 this.minElevationInMeters = Math.min(this.minElevationInMeters, minMaxTree.minimum);
