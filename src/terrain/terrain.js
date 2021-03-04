@@ -743,7 +743,7 @@ export class Terrain extends Elevation {
 
     getMinElevationBelowMSL(): number {
         let min = 0;
-        this._visibleDemTiles.filter(tile => tile.dem).map(tile => {
+        this._visibleDemTiles.filter(tile => tile.dem).forEach(tile => {
             const minMaxTree = (tile.dem: any).tree;
             min = Math.min(min, minMaxTree.minimum);
         });
