@@ -211,7 +211,6 @@ export class Terrain extends Elevation {
     _emptyDEMTexture: ?Texture;
     _initializing: ?boolean;
     _emptyDEMTextureDirty: ?boolean;
-    minElevationInMeters: number;
 
     constructor(painter: Painter, style: Style) {
         super();
@@ -246,7 +245,7 @@ export class Terrain extends Elevation {
         this._tilesDirty = {};
         this.style = style;
         this._useVertexMorphing = true;
-        this.minElevationInMeters = 0;
+        this._exaggeration = 1;
     }
 
     set style(style: Style) {
@@ -307,12 +306,6 @@ export class Terrain extends Elevation {
             this.proxySourceCache.update(transform);
 
             this._emptyDEMTextureDirty = true;
-
-            this.minElevationInMeters = 0;
-            for (let tile of this._visibleDemTiles) {
-                const minMaxTree = tile.dem._tree;
-                this.minElevationInMeters = Math.min(this.minElevationInMeters, minMaxTree.minimum);
-            }
         } else {
             this._disable();
         }
@@ -746,6 +739,15 @@ export class Terrain extends Elevation {
         }
 
         return {efficiency: (1.0 - uncacheableLayerCount / drapedLayerCount) * 100.0, firstUndrapedLayer};
+    }
+
+    getMinElevationBelowMSL(): number {
+        let min = 0;
+        this._visibleDemTiles.filter(tile => tile.dem).map(tile => {
+            const minMaxTree = (tile.dem: any).tree;
+            min = Math.min(min, minMaxTree.minimum);
+        });
+        return min * this._exaggeration;
     }
 
     // Performs raycast against visible DEM tiles on the screen and returns the distance travelled along the ray.
